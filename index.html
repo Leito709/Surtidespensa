@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#176b3a"><link rel="manifest" href="manifest.json">
+<meta name="description" content="Surtidespensa: compra productos de despensa y envía tu pedido por WhatsApp."><meta name="robots" content="index,follow"><title>Surtidespensa | Pedidos de despensa por WhatsApp</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Arial,sans-serif;background:#f5f7f5;color:#18231c}
+header{background:linear-gradient(135deg,#176b3a,#249452);color:#fff;padding:25px 18px 22px;position:sticky;top:0;z-index:5;box-shadow:0 3px 15px #0002}
+.brand{font-size:28px;font-weight:800}.tag{opacity:.9;margin-top:4px}.search{margin-top:18px;width:100%;padding:13px 15px;border:0;border-radius:12px;font-size:16px}
+main{max-width:950px;margin:auto;padding:18px 16px 95px}.section{display:flex;justify-content:space-between;align-items:center;margin:8px 0 14px}.section h2{font-size:19px;margin:0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.card{background:#fff;border-radius:17px;padding:13px;box-shadow:0 3px 14px #17351f12;border:1px solid #e8eee9}
+.pic{height:105px;border-radius:13px;background:#eef4ef;display:grid;place-items:center;font-size:48px}.card h3{font-size:15px;margin:10px 0 4px;min-height:38px}.price{font-size:19px;font-weight:800;color:#176b3a}.unit{font-size:12px;color:#78837b}.add{width:100%;border:0;background:#176b3a;color:white;border-radius:10px;padding:10px;margin-top:10px;font-weight:700}
+.cart{position:fixed;right:18px;bottom:18px;z-index:8;border:0;background:#f0b429;color:#18231c;border-radius:999px;padding:15px 19px;font-weight:800;box-shadow:0 6px 20px #0004}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:20}.box{background:#fff;max-width:520px;margin:6vh auto;border-radius:20px;padding:21px;max-height:88vh;overflow:auto}.close{float:right;border:0;background:none;font-size:28px}.item{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #e5e5e5;padding:12px 0}.qty button{border:1px solid #ddd;background:#fff;border-radius:7px;padding:3px 9px}.total{text-align:right;font-size:21px;font-weight:900;margin:16px 0}input,textarea,select{width:100%;padding:12px;margin:6px 0;border:1px solid #dce3de;border-radius:10px;font-size:15px}.send{width:100%;border:0;background:#176b3a;color:#fff;border-radius:11px;padding:14px;font-size:16px;font-weight:800;margin-top:8px}.note{font-size:12px;color:#69736c}.empty{text-align:center;padding:25px;color:#777}
+@media(min-width:650px){.grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<header><div class="brand">🛒 Surtidespensa</div><div class="tag">Tu despensa, fácil desde casa</div><input id="search" class="search" placeholder="🔎 Buscar en la tienda..." oninput="render()"></header>
+<main><div class="section"><h2>Productos</h2><span id="count"></span></div><div id="products" class="grid"></div></main>
+<button class="cart" onclick="openCart()">🛒 Ver carrito · <span id="cartCount">0</span></button>
+<div id="modal" class="modal"><div class="box"><button class="close" onclick="closeCart()">×</button><h2>Tu pedido</h2><div id="items"></div><div class="total">Total: $<span id="total">0.00</span></div>
+<h3>Datos del pedido</h3><input id="name" placeholder="Nombre"><input id="phone" placeholder="Teléfono"><textarea id="address" rows="3" placeholder="Dirección y referencias"></textarea>
+<select id="pay"><option>Efectivo</option><option>Transferencia</option><option>Pago al recibir</option></select>
+<button class="send" onclick="sendOrder()">📲 Enviar pedido por WhatsApp</button><p class="note">El pedido se enviará directamente al WhatsApp de Surtidespensa.</p></div></div>
+<script>
+const WA="529921144488";
+const products=[{id:1,n:"Aceite",p:50,e:"🫗"},{id:2,n:"Aceite chico",p:32,e:"🫗"},{id:3,n:"Maseca",p:25,e:"🌽"},{id:4,n:"Arroz",p:12,e:"🍚"},{id:5,n:"Azúcar",p:30,e:"🧂"},{id:6,n:"Sal",p:15,e:"🧂"},{id:7,n:"Sopa",p:12,e:"🍜"},{id:8,n:"Foca",p:15,e:"🧼"},{id:9,n:"Foca grande",p:30,e:"🧼"},{id:10,n:"Ariel",p:32,e:"🧺"},{id:11,n:"Claro",p:22,e:"🧴"},{id:12,n:"Cloro",p:15,e:"🧴"},{id:13,n:"Cloro chico",p:12,e:"🧴"},{id:14,n:"Papel",p:32,e:"🧻"}];
+let cart={};
+const money=n=>n.toFixed(2);
+function render(){let q=document.getElementById("search").value.toLowerCase();let a=products.filter(x=>x.n.toLowerCase().includes(q));document.getElementById("count").textContent=a.length+" productos";document.getElementById("products").innerHTML=a.map(x=>`<div class="card"><div class="pic">${x.e}</div><h3>${x.n}</h3><div class="price">$${money(x.p)}</div><div class="unit">Precio por pieza</div><button class="add" onclick="add(${x.id})">Agregar</button></div>`).join("")}
+function add(id){cart[id]=(cart[id]||0)+1;update()}
+function update(){document.getElementById("cartCount").textContent=Object.values(cart).reduce((a,b)=>a+b,0)}
+function openCart(){let total=0;document.getElementById("items").innerHTML=Object.entries(cart).map(([id,q])=>{let x=products.find(p=>p.id==id);total+=x.p*q;return `<div class="item"><div>${x.e} <b>${x.n}</b><br>$${money(x.p)} c/u</div><div class="qty"><button onclick="chg(${id},-1)">−</button> ${q} <button onclick="chg(${id},1)">+</button></div></div>`}).join("")||'<div class="empty">Tu carrito está vacío.</div>';document.getElementById("total").textContent=money(total);document.getElementById("modal").style.display="block"}
+function closeCart(){document.getElementById("modal").style.display="none"}
+function chg(id,d){cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];update();openCart()}
+function sendOrder(){let name=document.getElementById("name").value.trim(),phone=document.getElementById("phone").value.trim(),address=document.getElementById("address").value.trim(),pay=document.getElementById("pay").value;if(!name||!phone||!address||!Object.keys(cart).length){alert("Completa tus datos y agrega productos.");return}let total=0, lines=[];Object.entries(cart).forEach(([id,q])=>{let x=products.find(p=>p.id==id);total+=x.p*q;lines.push(`${q} x ${x.n} - $${money(x.p*q)}`)});let msg=`*NUEVO PEDIDO - SURTIDESPENSA*%0A%0A${lines.map(encodeURIComponent).join("%0A")}%0A%0A*TOTAL: $${money(total)}*%0A%0ANombre: ${encodeURIComponent(name)}%0ATeléfono: ${encodeURIComponent(phone)}%0ADirección: ${encodeURIComponent(address)}%0AMétodo de pago: ${encodeURIComponent(pay)}`;window.location.href=`https://wa.me/${WA}?text=${msg}`}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js')}render();update();
+</script>
+</body></html>
