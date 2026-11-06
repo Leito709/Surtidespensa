@@ -26,7 +26,7 @@ main{max-width:950px;margin:auto;padding:18px 16px 95px}.section{display:flex;ju
 <button class="send" onclick="sendOrder()">📲 Enviar pedido por WhatsApp</button><p class="note">El pedido se enviará directamente al WhatsApp de Surtidespensa.</p></div></div>
 <script>
 const WA="529921144488";
-const products=[{id:1,n:"Aceite",p:50,e:"🫗"},{id:2,n:"Aceite chico",p:32,e:"🫗"},{id:3,n:"Maseca",p:25,e:"🌽"},{id:4,n:"Arroz",p:12,e:"🍚"},{id:5,n:"Azúcar",p:30,e:"🧂"},{id:6,n:"Sal",p:15,e:"🧂"},{id:7,n:"Sopa",p:12,e:"🍜"},{id:8,n:"Foca",p:15,e:"🧼"},{id:9,n:"Foca grande",p:30,e:"🧼"},{id:10,n:"Ariel",p:32,e:"🧺"},{id:11,n:"Claro",p:22,e:"🧴"},{id:12,n:"Cloro",p:15,e:"🧴"},{id:13,n:"Cloro chico",p:12,e:"🧴"},{id:14,n:"Papel",p:32,e:"🧻"}];
+const products=[{id:1,n:"Aceite",p:50,e:"🫗"},{id:2,n:"Aceite chico",p:32,e:"🫗"},{id:3,n:"Maseca",p:25,e:"🌽"},{id:4,n:"Arroz",p:12,e:"🍚"},{id:5,n:"Azúcar",p:30,e:"🧂"},{id:6,n:"Sal",p:15,e:"🧂"},{id:7,n:"Sopa",p:12,e:"🍜"},{id:8,n:"Jabon chico Foca",p:15,e:"🧼"},{id:9,n:"Jabon Foca grande",p:30,e:"🧼"},{id:10,n:"Jabon Ariel",p:32,e:"🧺"},{id:11,n:"Claro",p:22,e:"🧴"},{id:12,n:"Cloro Grande",p:15,e:"🧴"},{id:13,n:"Cloro chico",p:12,e:"🧴"},{id:14,n:"Papel",p:32,e:"🧻"}];
 let cart={};
 const money=n=>n.toFixed(2);
 function render(){let q=document.getElementById("search").value.toLowerCase();let a=products.filter(x=>x.n.toLowerCase().includes(q));document.getElementById("count").textContent=a.length+" productos";document.getElementById("products").innerHTML=a.map(x=>`<div class="card"><div class="pic">${x.e}</div><h3>${x.n}</h3><div class="price">$${money(x.p)}</div><div class="unit">Precio por pieza</div><button class="add" onclick="add(${x.id})">Agregar</button></div>`).join("")}
